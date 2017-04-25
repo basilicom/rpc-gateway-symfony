@@ -1,5 +1,5 @@
 {
-    "name": "basilicom/rpc-gateway",
+    "name": "basilicom/rpc-gateway-symfony",
     "description": "rpc gateway lib",
     "type": "lib",
     "license": "BSD-3-Clause",
