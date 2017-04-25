@@ -1,6 +1,6 @@
 {
     "name": "basilicom/rpc-gateway-symfony",
-    "description": "rpc gateway lib",
+    "description": "rpc gateway lib for symfony",
     "type": "lib",
     "license": "BSD-3-Clause",
     "keywords": ["rpc"],
