@@ -22,6 +22,13 @@ class Gateway
      */
     protected $serviceClassNamespace = '\\App\\Rpc\\Service\\';
 
+
+    function __construct(SymfonyRequest $request)
+    {
+        $this->setRequest($request);
+        $this->setResponse(new SymfonyResponse());
+    }
+
     /**
      * @param SymfonyRequest $request
      * @return array
@@ -29,12 +36,13 @@ class Gateway
      */
     protected function getJsonRequestFromRequestRawBody(SymfonyRequest $request)
     {
-        $requestText = $request->getContent();
-        $rpcData = json_decode($requestText, true);
+        $requestRawBody = $request->getContent();
+        $rpcData = json_decode($requestRawBody, true);
 
         if (!is_array($rpcData)) {
             throw new \Exception("Invalid request at " . __METHOD__);
         }
+        //var_dump($rpcData);die();
 
         return $rpcData;
     }
@@ -212,6 +220,8 @@ class Gateway
         $response->setContent(
             json_encode($responseData)
         );
+
+        return $response;
     }
 
     /**
@@ -234,10 +244,12 @@ class Gateway
         $response->setContent(
             json_encode($responseData)
         );
+
+        return $response;
     }
 
     /**
-     * @return void
+     * @return SymfonyResponse
      */
     public function dispatch()
     {
@@ -246,7 +258,7 @@ class Gateway
             $this->getRequest()
         );
 
-        /** @var $rpcRequest \RpcGateway\Request */
+        /** @var $rpcRequest Request */
         $rpcRequest = $this->getRpcRequestFromJsonRequest(
             $jsonRequest
         );
@@ -261,15 +273,13 @@ class Gateway
                 'message' => $exception->getMessage(),
             );
 
-            $this->putErrorAsJsonRpcIntoResponse(
+            return $this->putErrorAsJsonRpcIntoResponse(
                 $result,
                 $this->getResponse()
             );
-
-            return;
         }
 
-        $this->putResultAsJsonRpcIntoResponse(
+        return $this->putResultAsJsonRpcIntoResponse(
             $result,
             $this->getResponse()
         );
