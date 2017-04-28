@@ -42,36 +42,19 @@ Developer info: [basilicom](http://basilicom.de/)
 ```php
 <?php
 
-	use Pimcore\Config;
+namespace AppBundle\Controller;
 
-	class RpcController extends \Website\Controller\Action
-	{
+use Symfony\Component\HttpFoundation\Request;
 
-		/**
-		 * @return void
-		 */
-		public function defaultAction()
-		{
-			$this->disableViewAutoRender();
+class RpcController extends AbstractController
+{
 
-			try {
-				$gateway = new \RpcGateway\Gateway();
-				$gateway->setServiceClassNamespace('\Website\App\Rpc\Service\\')
-				$gateway->setRequest($this->getRequest());
-				$gateway->setResponse($this->getResponse());
-				$gateway->dispatch();
-
-			} catch (\Exception $e) {
-
-				if (Config::getSystemConfig()->get('general')->debug) {
-					var_dump($e);
-					exit;
-				} else {
-					echo "NO METHOD";
-					die();
-				}
-			}
-		}
-	}
+    public function defaultAction(Request $request)
+    {
+        $gateway = new \RpcGateway\Gateway($request);
+        $gateway->setServiceClassNamespace('\AppBundle\Rpc\\');
+        return $gateway->dispatch();
+    }
+}
 
 ```

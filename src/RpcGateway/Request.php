@@ -58,7 +58,6 @@ class Request
     {
         /** @noinspection PhpUnusedLocalVariableInspection */
         list($className, $methodName) = $this->getListOfClassNameAndMethod();
-
         return $className;
     }
 
@@ -69,7 +68,6 @@ class Request
     {
         /** @noinspection PhpUnusedLocalVariableInspection */
         list($className, $methodName) = $this->getListOfClassNameAndMethod();
-
         return $methodName;
     }
 
@@ -78,17 +76,9 @@ class Request
      */
     protected function getListOfClassNameAndMethod()
     {
-        $methodParts = explode(
-            self::METHOD_DELIMITER,
-            $this->getMethod()
-        );
-
+        $methodParts = explode(self::METHOD_DELIMITER, $this->getMethod());
         $methodName = array_pop($methodParts);
         $className = implode(self::METHOD_DELIMITER, $methodParts);
-
-        return array(
-            $className,
-            $methodName
-        );
+        return [$className, $methodName];
     }
 }
