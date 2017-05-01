@@ -157,7 +157,7 @@ class Gateway
             $this->getServiceClassNamespace()
             . str_replace(Request::METHOD_DELIMITER, '_', $rpcRequest->getClassName());
 
-        if (class_exists($serviceClassName)) {
+        if (!class_exists($serviceClassName)) {
             throw new \Exception("Invalid rpc.method [" . $rpcRequest->getMethod() . "] (not found) at " . __METHOD__);
         }
 
@@ -177,7 +177,8 @@ class Gateway
         $serviceMethodReflection = $serviceClassReflection->getMethod($serviceMethodName);
 
         if (
-            ($serviceMethodReflection->isAbstract()) || ($serviceMethodReflection->isConstructor())
+            ($serviceMethodReflection->isAbstract())
+            || ($serviceMethodReflection->isConstructor())
             || ($serviceMethodReflection->isStatic())
             || (!$serviceMethodReflection->isPublic())
         ) {
