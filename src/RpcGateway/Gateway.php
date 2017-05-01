@@ -47,7 +47,7 @@ class Gateway
 
             $result = $this->invokeRpcRequest($rpcRequest);
 
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
 
             $result = array(
                 'code' => $exception->getCode(),
@@ -77,7 +77,7 @@ class Gateway
         $rpcData = json_decode($requestRawBody, true);
 
         if (!is_array($rpcData)) {
-            throw new Exception("Invalid request at " . __METHOD__);
+            throw new \Exception("Invalid request at " . __METHOD__);
         }
 
         return $rpcData;
@@ -109,11 +109,11 @@ class Gateway
         $rpcRequest = new Request();
 
         if (!array_key_exists('method', $jsonData)) {
-            throw new Exception("Invalid method at " . __METHOD__);
+            throw new \Exception("Invalid method at " . __METHOD__);
         }
 
         if (!(array_key_exists('params', $jsonData) && is_array($jsonData['params']))) {
-            throw new Exception("Invalid params at " . __METHOD__);
+            throw new \Exception("Invalid params at " . __METHOD__);
         }
 
         $rpcRequest->method = (string)$jsonData['method'];
@@ -158,7 +158,7 @@ class Gateway
             . str_replace(Request::METHOD_DELIMITER, '_', $rpcRequest->getClassName());
 
         if (class_exists($serviceClassName)) {
-            new Exception("Invalid rpc.method [" . $rpcRequest->getMethod() . "] (not found) at " . __METHOD__);
+            throw new \Exception("Invalid rpc.method [" . $rpcRequest->getMethod() . "] (not found) at " . __METHOD__);
         }
 
         $serviceClassReflection = new \ReflectionClass($serviceClassName);
@@ -167,11 +167,11 @@ class Gateway
             || ($serviceClassReflection->isInterface())
             || ($serviceClassReflection->isInternal())
         ) {
-            throw new Exception("Invalid rpc.class [" . $rpcRequest->getMethod() . "] at " . __METHOD__);
+            throw new \Exception("Invalid rpc.class [" . $rpcRequest->getMethod() . "] at " . __METHOD__);
         }
 
         if ($serviceClassReflection->hasMethod($serviceMethodName) !== true) {
-            throw new Exception("Invalid rpc.method [" . $rpcRequest->getMethod() . "] (not found) at " . __METHOD__);
+            throw new \Exception("Invalid rpc.method [" . $rpcRequest->getMethod() . "] (not found) at " . __METHOD__);
         }
 
         $serviceMethodReflection = $serviceClassReflection->getMethod($serviceMethodName);
@@ -181,7 +181,7 @@ class Gateway
             || ($serviceMethodReflection->isStatic())
             || (!$serviceMethodReflection->isPublic())
         ) {
-            throw new Exception("Invalid rpc.method [" . $rpcRequest->getMethod() . "] (not invokable) at " . __METHOD__);
+            throw new \Exception("Invalid rpc.method [" . $rpcRequest->getMethod() . "] (not invokable) at " . __METHOD__);
         }
 
         $argsExpectedMin = $serviceMethodReflection->getNumberOfRequiredParameters();
@@ -190,7 +190,7 @@ class Gateway
         $argsGiven = count($rpcRequest->getParams());
 
         if (($argsGiven < $argsExpectedMin) || ($argsGiven > $argsExpectedMax)) {
-            throw new Exception(
+            throw new \Exception(
                 'Invalid rpc.method ['
                 . $rpcRequest->getMethod()
                 . ']'
