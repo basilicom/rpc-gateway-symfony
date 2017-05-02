@@ -15,9 +15,30 @@ class Request
     public $method = '';
 
     /**
+     * @var string
+     */
+    public $token = '';
+
+    /**
      * @var array
      */
-    public $params = array();
+    public $params = [];
+
+    /**
+     * @return string
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    /**
+     * @param string $token
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
+    }
 
     /**
      * @return string

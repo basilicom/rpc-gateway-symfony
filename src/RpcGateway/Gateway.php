@@ -42,7 +42,7 @@ class Gateway
 
             /** @var $rpcRequest Request */
             $rpcRequest = $this->getRpcRequestFromJsonRequest(
-                $jsonRequest
+                $jsonRequest, $this->getRequest()
             );
 
             $result = $this->invokeRpcRequest($rpcRequest);
@@ -101,10 +101,11 @@ class Gateway
 
     /**
      * @param $jsonData array
+     * @param $request SymfonyRequest
      * @throws \Exception
      * @return \RpcGateway\Request
      */
-    protected function getRpcRequestFromJsonRequest($jsonData)
+    protected function getRpcRequestFromJsonRequest($jsonData, $request)
     {
         $rpcRequest = new Request();
 
@@ -116,8 +117,20 @@ class Gateway
             throw new \Exception("Invalid params at " . __METHOD__);
         }
 
-        $rpcRequest->method = (string)$jsonData['method'];
-        $rpcRequest->params = $jsonData['params'];
+        $omitToken = (bool)$jsonData['omitToken'];
+
+        if(!$omitToken) {
+            $token = $jsonData['token'];
+
+            if (empty($token)) {
+                throw new \Exception("No token at " . __METHOD__);
+            }
+
+            $rpcRequest->setToken((string)$token);
+        }
+
+        $rpcRequest->setMethod((string)$jsonData['method']);
+        $rpcRequest->setParams((array)$jsonData['params']);
 
         return $rpcRequest;
     }
@@ -134,10 +147,9 @@ class Gateway
         // create a PHP compatible version of the requested service class
         $serviceClassName = $this->getServiceClassNamespace() . str_replace(Request::METHOD_DELIMITER, '_',
                 $rpcRequest->getClassName());
-        $serviceClass = new $serviceClassName();
+        $serviceClass = new $serviceClassName($rpcRequest->getToken());
         $serviceClassReflection = new \ReflectionClass($serviceClassName);
-        $serviceMethodName = $rpcRequest->getMethodName();
-        $serviceMethodReflection = $serviceClassReflection->getMethod($serviceMethodName);
+        $serviceMethodReflection = $serviceClassReflection->getMethod($rpcRequest->getMethodName());
         $serviceCallResult = $serviceMethodReflection->invokeArgs($serviceClass, $rpcRequest->getParams());
 
         return $serviceCallResult;
